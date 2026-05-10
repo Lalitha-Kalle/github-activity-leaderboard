@@ -1,6 +1,5 @@
 from pydantic import BaseModel
 from datetime import datetime
-from uuid import UUID
 
 class AddUserRequest(BaseModel):
     github_username: str
