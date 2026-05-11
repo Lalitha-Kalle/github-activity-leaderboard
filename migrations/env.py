@@ -53,23 +53,22 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
-    """Run migrations in 'online' mode.
+    import os
+    from sqlalchemy import create_engine
+    from dotenv import load_dotenv
 
-    In this scenario we need to create an Engine
-    and associate a connection with the context.
+    load_dotenv()
 
-    """
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    # Read DATABASE_URL from environment, replace asyncpg with psycopg2 for alembic
+    db_url = os.environ.get("DATABASE_URL", "").replace("+asyncpg", "+psycopg2")
+
+    connectable = create_engine(db_url, poolclass=pool.NullPool)
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata
         )
-
         with context.begin_transaction():
             context.run_migrations()
 
